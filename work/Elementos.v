@@ -1,3 +1,9 @@
+/*
+Nombre: Multiplexor de 2 entradas
+Proposito: Multiplexar registros A y B
+Entradas: Registros A y B
+Salidas: Los registros o los datos de informacion de la decodificacion
+*/
 module MUX # ( parameter SIZE = 2)
 (
 	output reg [SIZE-1:0] Result,
@@ -16,6 +22,13 @@ module MUX # ( parameter SIZE = 2)
 endmodule
 ///////////////////////////josuegay
 //----------------------------------------------------
+
+/*
+Nombre: Registro de flip flops
+Proposito: Guardar informacion de los registros A y B
+Entradas: Linea que viene de la Alu y la memoria de datos
+Salidas: Linea almacenada en los registros A o B 
+*/
 module FFD # ( parameter SIZE=8 )
 (
 	input wire				Clock,
