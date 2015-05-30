@@ -14,7 +14,7 @@ module MUX # ( parameter SIZE = 2)
 		endcase
 	end
 endmodule
-
+///////////////////////////josuegay
 //----------------------------------------------------
 module FFD # ( parameter SIZE=8 )
 (
