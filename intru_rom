@@ -1,0 +1,95 @@
+//================Varios NOP para cargar memoria========================
+100101_0001100100  //	NOP_100 
+100101_0001100101  //	NOP_101
+100101_0001100110  //	NOP_102
+100101_0001100111  //	NOP_103
+
+//=========Cargar una constante a A y guardarla en @100=================
+000010_0000001010	//	LDCA_10-->Se carga en A contsante 10
+000100_0001100100	//	STA_100-->Se guarada en la posición MEM->100
+
+//=========Cargar una constante a B y guardarla en @101=================
+000011_0000010000	//	LDCB_16-->Se carga en B contsante 16
+000101_0001100101	//	STB_101-->Se guarada en la posición MEM->101
+
+//========================Programa Suma================================= 
+000110_0000000001	//	ADDA_X--> Suma A+B--> A : 10+16=26
+000100_0001100110	//	STA_102--> Se guarada en la posición MEM->102
+
+000111_0000000001	//	ADDB_X-->Suma A+B--> B : 26+16 = 42
+000101_0001100111	//	STB_103-->Se guarada en la posición MEM->103
+
+000111_0000001010 	//	ADDCA_10-->Suma A+10--> A : 26+10=36
+000100_0001101000	//	STA_104-->Se guarada en la posición MEM->104
+
+001001_0000001010	//	ADDCB_10-->Suma B+10--> B : 42+10=52
+000101_0001101001	//	STB_105-->Se guarada en la posición MEM->105
+
+//========================Programa Resta=====================
+001011_0000001010	//	SUBB_X-->Resta B-A--> B : 52-36=16
+000101_0001101010	//	STB_106-->Se guarada en la posición MEM->106
+
+001010_0000001010	//	SUBA_X-->Resta A-B--> A : 36-16 = 20
+000100_0001101011	//	STA_107-->Se guarada en la posición MEM->107
+
+001100_0000001010	//	SUBCA_10-->Resta A-10--> A : 20-10=10
+000100_0001101100	//	STA_108-->Se guarada en la posición MEM->108
+
+001101_0000001010	//	SUBCB_10-->Resta B-10--> B : 16-10=6
+000101_0001101101	//	STB_109-->Se guarada en la posición MEM->109
+
+//========================Programa AND ==========================
+001110_0000000000	// ANDA_X --> Hace AND de A y B lo guarda en A=2
+000100_0001101110	//	STA_110-->Se guarada en la posición MEM->110
+
+001111_0000000000	// ANDB_X --> Hace AND de A y B lo guarda en B=2
+000101_0001101111	//	STB_111-->Se guarada en la posición MEM->111
+
+010000_0000000111	// ANDCA_7 --> Hace AND de A y 7 lo guarda en A=2
+010001_0000000111	// ANDCB_7 --> Hace AND de B y 7 lo guarda en B=2
+
+//========================Programa OR ==============================
+000010_0000001010	//	LDCA_10-->Se carga en A contsante 10
+000011_0000010000	//	LDCB_16-->Se carga en B contsante 16
+010010_0000000000	// 	ORA_X --> Hace OR de A y B lo guarda en A=11010=26
+000100_0001110000	//	STA_112-->Se guarada en la posición MEM->112
+
+000011_1010101010	//	LDCB_682-->Se carga en B contsante 682
+010011_0000000000	// 	ORB_X --> Hace OR de A y B lo guarda en B=1010111010=698
+000101_0001110001	//	STB_113-->Se guarada en la posición MEM->113
+
+010100_0000000111	// ORCA_7 --> Hace OR de A y 7 lo guarda en A=0000011111=31
+000100_0001110010	//	STA_114-->Se guarada en la posición MEM->114
+
+010101_0000000111	// ORCB_7 --> Hace OR de B y 7 lo guarda en B=1010111111=703
+000101_0001110011	//	STB_115-->Se guarada en la posición MEM->115
+
+//========================Programa Desplazamiento ===================
+
+010110_0000000111	// ASLA_X --> Desplaza izquierda A A=0000111110 =62
+000100_0001110100	//	STA_116-->Se guarada en la posición MEM->114
+
+010101_0000000111	// ASLB_X --> Hace OR de B y 7 lo guarda en B=0101111110=382
+000101_0001110101	//	STB_117-->Se guarada en la posición MEM->117
+
+
+
+//======================= Programa de Salto ============================
+
+011000_0000110001	// JMP_50 --> Salta a posición 50
+100101_0001100100  //	NOP_100 
+100101_0001100101  //	NOP_101
+100101_0001100110  //	NOP_102
+100101_0001100111  //	NOP_103
+
+//======================= Programa Carga desde memoria ================
+
+
+
+
+
+
+
+
+
+
