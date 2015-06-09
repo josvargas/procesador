@@ -19,7 +19,7 @@
 			4: Out <= A | B;
 			5: Out <= A<<1;
 			6: Out <= A>>1;
-			default: Out <= 0;
+			default: Out <= Out;
 		endcase	
 	
 	end
