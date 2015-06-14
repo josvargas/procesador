@@ -34,10 +34,12 @@ module procesador # (parameter n=8)
 	wire [9:0] wBranchOperation, wBranchOperation_salida;
 	
 	//Cableado para muxRegistro A y B
-	wire [7:0] wMuxA_salida, wMuxB_salida, wConstant, wConstant_aux;
+	wire [7:0] wMuxA_salida, wMuxB_salida, wConstant_aux;
 	wire wSelectMuxRegA, wSelectMuxRegB;
 	
-	assign wConstant_aux = wConstant[7:0]; // se asigna para poder usarse para el mux del registro B
+	assign wConstant_aux = wAditional[7:0]; // se asigna para poder usarse para el mux del registro B
+	assign wRegistroA_entrada = wRegistrosAB [7:0];
+	assign wRegistroB_entrada = wRegistrosAB [7:0];  // Ojo aca que los registros tienen que ser diferentes
 	
 	//Cableado de la ALU
 	wire [2:0] wALUControl;
@@ -45,7 +47,9 @@ module procesador # (parameter n=8)
 	wire wN, wZ, wC;
 	
 	//Cableado de MEM
-	
+	wire [9:0] wReadAddress, wWriteAddress;
+	assign wReadAddress = wAditional [9:0];
+	assign wWriteAddress = wAditional [9:0];
 
 	//////////////////////////////////////////////////////////
 	// Alambrado de Fetch
@@ -106,8 +110,8 @@ module procesador # (parameter n=8)
 		.oSelectMuxRegA(wSelectMuxRegA),
 		.oSelectMuxRegB(wSelectMuxRegB),        
 		.oEnableMem(wEnableMem),            
-		.oMuxWriteMem(wMuxWriteMem),
-		.oSelectInputMemData(wSelectInputMemData)
+		.oMuxWriteMem(wMuxWriteMem),   // No lo he usado
+		.oSelectInputMemData(wSelectInputMemData)  //No lo he usado
 	);
 	
 	// Alambrado para registro A
@@ -117,8 +121,8 @@ module procesador # (parameter n=8)
 		.Clock(Clock),
 		.Reset(Reset),
 		.Enable(wEnableA_WB), // Revisar esto
-		.D(wRegistroA_entrada), //esto tambien
-		.Q(wRegistroA_salida)	//esto tambien
+		.D(wRegistroB_entrada), //esto tambien
+		.Q(wRegistroA_salida)	
 	);
 	
 	// Alambrado para registro B
@@ -129,7 +133,7 @@ module procesador # (parameter n=8)
 		.Reset(Reset),
 		.Enable(wEnableB_WB),  // Revisar esto
 		.D(wRegistroB_entrada), // esto tambien
-		.Q(wRegistroB_salida)	// esto tambien
+		.Q(wRegistroB_salida)	
 	);
 	
 	// Alambrado para registro de branchTaken
@@ -150,8 +154,8 @@ module procesador # (parameter n=8)
 		.Clock(Clock),
 		.Reset(Reset),
 		.Enable(1),
-		.D(wBranchOperation), // esto tambien
-		.Q(wBranchOperation_salida)	// esto tambien
+		.D(wBranchOperation), // Cambiar esto por el calculo de la direccion del branch
+		.Q(wBranchOperation_salida)	
 	);
 	
 	//////////////////////////////////////////////////////////////
@@ -162,7 +166,7 @@ module procesador # (parameter n=8)
 	
 	mux #(8) muxRegistroA
 	(
-		.A(wConstant),
+		.A(wAditional[7:0]),
 		.B(wRegistroA_salida),
 		.Sel(wSelectMuxRegA),
 		.Result(wMuxA_salida)
@@ -195,17 +199,15 @@ module procesador # (parameter n=8)
 	// Alambrado MEM
 	//////////////////////////////////////////////////////////////
 	
-	RAM_DUAL_READ_PORT #(8) ram
+	RAM_DUAL_READ_PORT #(8, 10, 10) ram
 	(
 		.Clock(Clock),
 		.iWriteEnable(wEnableMem),
-		.iReadAddress(),
-		.iWriteAddress(),
+		.iReadAddress(wReadAddress),
+		.iWriteAddress(wWriteAddress),
 		.iDataIn(wSalida_ALU),
-		.oDataOut()
+		.oDataOut(wRegistrosAB)
 	);
-	
-	
 	
 endmodule
 	
