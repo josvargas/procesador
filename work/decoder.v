@@ -22,7 +22,7 @@ Salidas: Contenido de los registros y lineas de control
 	 output reg oSelectMuxRegB,        //Linea que habilita el mux para elegir el Registro B o la informacion adicional en la ALU
 	 output reg oEnableMem,              //Linea que habilita las escrituras en la memoria en 1
 	 output reg oMuxWriteMem,            //Selecciona la entrada del registro (A o B) que va a la entrada de Datos de la memoria RAM 
-	 output reg oSelectInputMemData      //Linea que habilita el mux para elegir la salida de la ALU (0) o la salida de la RAM de  						     //datos (1) para seleccionar la escritura en los registros 
+	 output reg oSelectInputMemData      //Linea que habilita el mux para elegir la salida de la ALU (0) o la salida de la RAM de//datos (1) para seleccionar la escritura en los registros 
 	);
 
 	wire [5:0] wCodeInstruction;
@@ -45,9 +45,9 @@ begin
 		oBranchOperation <= 4'd0;     //Opcion de confirma que la instruccion no es un salto
 		oSelectMuxRegA   <= 1'b0;
 		oSelectMuxRegB   <= 1'b0;
-	        oEnableMem   	 <= 1'b0;
+	    oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
-	        oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
+	    oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
 	end
 	//-------------------------------------
 	`LDB:
@@ -600,9 +600,9 @@ begin
 		oBranchOperation <= 4'd13;      //Se selecciona la opcion de salto C_A=0
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
-	        oEnableMem   	 <= 1'b0;     
+	    oEnableMem   	 <= 1'b0;     
 		oMuxWriteMem     <= 1'b0;     
-	        oSelectInputMemData <= 1'b0;  
+	    oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
 	`NOP:
@@ -615,9 +615,9 @@ begin
 		oBranchOperation <= 4'd0;      
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
-	        oEnableMem   	 <= 1'b0;     
+	    oEnableMem   	 <= 1'b0;     
 		oMuxWriteMem     <= 1'b0;     
-	        oSelectInputMemData <= 1'b0;  
+	    oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
 	default:

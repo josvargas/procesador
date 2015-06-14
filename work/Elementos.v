@@ -53,4 +53,28 @@ end//always
 
 endmodule
 
+//----------------------------------------------------
+
+/*
+Nombre: Sumador para contador de PC
+Proposito: Aumenta en 1 el valor del registro de PC para la nueva instruccion
+Entradas: PC_entrada, almacena el numero actual del contador del programa
+Salidas: PC_salida, almacena el valor del proximo valor del contador del programa
+*/
+
+module ALU_PC # (parameter SIZE=6)
+(
+	input wire Clock,
+	input wire [SIZE-1:0] PC_entrada,
+	input wire Enable,
+	output reg [SIZE-1:0] PC_salida
+);
+	always @(posedge Clock)
+	begin
+		if (Enable)
+			PC_salida = PC_entrada + 1;		
+	end
+
+endmodule
+
 
