@@ -401,9 +401,9 @@ begin
 		oEnableB_ID  <= 1'b0;
 		oEnableA_WB  <= 1'b0;         
 		oEnableB_WB  <= 1'b0;       
-		oALUControl  <= 3'd7;         
-		oBranchOperation <= 4'd1;      //Se selecciona la opcion de salto JMP
-		oSelectMuxRegA   <= 1'b0;          
+		oALUControl  <= 3'd7;
+		BranchOperation <= 4'd1;      //Se selecciona la opcion de salto para jmp
+		oSelectMuxRegA   <= 1'b0; 
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
 		oMuxWriteMem     <= 1'b0;     
@@ -448,21 +448,6 @@ begin
 		oEnableB_WB  <= 1'b0;       
 		oALUControl  <= 3'd7;         
 		oBranchOperation <= 4'd4;      //Se selecciona la opcion de salto C_A=1
-		oSelectMuxRegA   <= 1'b0;          
-		oSelectMuxRegB   <= 1'b0;
-	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
-	        oSelectInputMemData <= 1'b0;  
-	end
-	//-------------------------------------
-	`BACC:
-	begin
-		oEnableA_ID  <= 1'b0;
-		oEnableB_ID  <= 1'b0;
-		oEnableA_WB  <= 1'b0;         
-		oEnableB_WB  <= 1'b0;       
-		oALUControl  <= 3'd7;         
-		oBranchOperation <= 4'd5;      //Se selecciona la opcion de salto C_A=0
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     

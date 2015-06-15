@@ -12,8 +12,8 @@ module procesador # (parameter n=8)
 );
 
 	// Cableado para PC
-	wire [9:0] wPC_entrada, wPC_salida, wPC_suma, wPC_mux, wPC_memInstr;
-	
+	wire [9:0] wPC_entrada, wPC_salida, wPC_suma, wPC_mux, wPC_new, wPC_mux2, wPC_memInstr;
+	assign wPC_new = wPC_mux[9:0];
 	assign wPC_memInstr = wPC_salida[9:0]; // se asigna a la salida del registro de PC para usarse en memoria de Instrucciones
 
 	// Cableado para decodificador
@@ -30,26 +30,37 @@ module procesador # (parameter n=8)
 	wire [7:0] wRegistroB_entrada, wRegistroB_salida;
 	
 	// Cableado para branchTaken y dirBranch
-	wire wBranchTaken, wBranchTaken_salida;
-	wire [9:0] wBranchOperation, wBranchOperation_salida;
+	wire wBranchTaken;
+	wire [5:0] wSalto;
 	
 	//Cableado para muxRegistro A y B
-	wire [7:0] wMuxA_salida, wMuxB_salida, wConstant_aux;
+	wire [7:0] wMuxA_salida, wMuxB_salida, wConstant_aux, wConstant_A, wConstant_B;
 	wire wSelectMuxRegA, wSelectMuxRegB;
 	
 	assign wConstant_aux = wAditional[7:0]; // se asigna para poder usarse para el mux del registro B
-	assign wRegistroA_entrada = wRegistrosAB [7:0];
-	assign wRegistroB_entrada = wRegistrosAB [7:0];  // Ojo aca que los registros tienen que ser diferentes
+	assign wConstant_A = wAditional[7:0];
+	assign wConstant_B = wAditional[7:0];
+	assign wSalto = wAditional[5:0];
 	
 	//Cableado de la ALU
 	wire [2:0] wALUControl;
-	wire [7:0] wMuxA_salida, wMuxB_salida, wSalida_ALU;
+	wire [7:0] wMuxA_salida, wMuxB_salida, wSalida_ALU, wSalida_ALU_aux, wRegistroA_salida_aux, wRegistroB_salida_aux;
+	assign wRegistroA_salida_aux = wRegistroA_salida[7:0];
+	assign wRegistroB_salida_aux = wRegistroB_salida[7:0];
+	wire wSalida_ALU_aux = wSalida_ALU[7:0];
 	wire wN, wZ, wC;
+
+	wire [7:0] wSelectorRegistros;
+	wire [7:0] wSalida_Registros_o_ALU;
+	
 	
 	//Cableado de MEM
 	wire [9:0] wReadAddress, wWriteAddress;
-	assign wReadAddress = wAditional [9:0];
-	assign wWriteAddress = wAditional [9:0];
+	wire [7:0] wSalida_RAM, wMuxAB_A, wMuxAB_B;
+	assign wReadAddress = wAditional[9:0];
+	assign wWriteAddress = wAditional[9:0];
+	assign wMuxAB_B = wMuxAB_A[9:0];
+
 
 	//////////////////////////////////////////////////////////
 	// Alambrado de Fetch
@@ -114,14 +125,31 @@ module procesador # (parameter n=8)
 		.oSelectInputMemData(wSelectInputMemData)  //No lo he usado
 	);
 	
+	//Alambrado de Muxes para habilitar escritura de WB
+	MUX #(8) mux_escritura_A_WB
+	(
+		.A(wConstant_A),
+		.B(wMuxAB_A),
+		.Sel(wEnableA_WB),
+		.Result(wRegistroA_entrada)
+	);
+	
+	MUX #(8) mux_escritura_B_WB
+	(
+		.A(wConstant_B),
+		.B(wMuxAB_B),
+		.Sel(wEnableB_WB),
+		.Result(wRegistroB_entrada)
+	);
+	
 	// Alambrado para registro A
 	
 	FFD #(8) registroA
 	(
 		.Clock(Clock),
 		.Reset(Reset),
-		.Enable(wEnableA_WB), // Revisar esto
-		.D(wRegistroB_entrada), //esto tambien
+		.Enable(wEnableA_ID), // Revisar esto
+		.D(wRegistroA_entrada), //esto tambien
 		.Q(wRegistroA_salida)	
 	);
 	
@@ -131,31 +159,26 @@ module procesador # (parameter n=8)
 	(
 		.Clock(Clock),
 		.Reset(Reset),
-		.Enable(wEnableB_WB),  // Revisar esto
+		.Enable(wEnableB_ID),  // Revisar esto
 		.D(wRegistroB_entrada), // esto tambien
 		.Q(wRegistroB_salida)	
 	);
 	
 	// Alambrado para registro de branchTaken
 	
-	FFD #(1) branchTaken
+	branchTaken branchTaken1
 	(
-		.Clock(Clock),
-		.Reset(Reset),
-		.Enable(1),
-		.D(wBranchTaken), // esto tambien
-		.Q(wBranchTaken_salida)	// esto tambien
+		.iBranchOperation(wBranchOperation),
+		.oTomaBranch(wBranchTaken)
 	);
 	
 	// Alambrado para registro de DirBranch
 	
-	FFD #(10) dirBranch
+	branchDir branchDirection //BranchDir
 	(
-		.Clock(Clock),
-		.Reset(Reset),
-		.Enable(1),
-		.D(wBranchOperation), // Cambiar esto por el calculo de la direccion del branch
-		.Q(wBranchOperation_salida)	
+		.iSalto(wSalto[5:0]),
+		.iNewPC(wPC_new),
+		.oDirNueva(wPC_mux2)
 	);
 	
 	//////////////////////////////////////////////////////////////
@@ -163,8 +186,7 @@ module procesador # (parameter n=8)
 	//////////////////////////////////////////////////////////////
 	
 	// Alambrado de mux para registro A
-	
-	mux #(8) muxRegistroA
+	MUX #(8) muxRegistroA
 	(
 		.A(wAditional[7:0]),
 		.B(wRegistroA_salida),
@@ -174,7 +196,7 @@ module procesador # (parameter n=8)
 	
 	// Alambrado de mux para registro B
 	
-	mux #(8) muxRegistroB
+	MUX #(8) muxRegistroB
 	(
 		.A(wConstant_aux),
 		.B(wRegistroB_salida),
@@ -195,6 +217,22 @@ module procesador # (parameter n=8)
 		.C(wC)
 	);
 	
+	MUX #(8) mux_AccesoRAM_sinALU
+	(
+		.A(wRegistroA_salida_aux),
+		.B(wRegistroB_salida_aux),
+		.Sel(wMuxWriteMem),
+		.Result(wSelectorRegistros)	
+	);
+	
+	MUX #(8) mux_Selector_Registros_o_ALU
+	(
+		.A(wSelectorRegistros),
+		.B(wSalida_ALU),
+		.Sel(wALUControl),
+		.Result(wSalida_Registros_o_ALU)
+	);
+	
 	//////////////////////////////////////////////////////////////
 	// Alambrado MEM
 	//////////////////////////////////////////////////////////////
@@ -205,8 +243,18 @@ module procesador # (parameter n=8)
 		.iWriteEnable(wEnableMem),
 		.iReadAddress(wReadAddress),
 		.iWriteAddress(wWriteAddress),
-		.iDataIn(wSalida_ALU),
-		.oDataOut(wRegistrosAB)
+		.iDataIn(wSalida_Registros_o_ALU),
+		.oDataOut(wSalida_RAM)
+	);
+	
+	// Alambrado de mux con salida de ALU y RAM
+	
+	MUX #(8) mux_ALU_RAM
+	(
+		.A(wSalida_ALU_aux),
+		.B(wSalida_RAM),
+		.Sel(wSelectInputMemData),
+		.Result(wMuxAB_A)
 	);
 	
 endmodule
