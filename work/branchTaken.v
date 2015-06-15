@@ -9,7 +9,7 @@ Salidas: el bit de branch taken
 
 	module branchTaken
 	(
-	 input wire [3:0] oBranchOperation,  
+	 input wire [3:0] iBranchOperation,  
 	 input wire N_A,Z_A,C_A,N_B,Z_B,C_B, 
 	 output reg oBranchTaken,             
 	);
@@ -17,7 +17,7 @@ Salidas: el bit de branch taken
 
 always @ ( * )
 begin
-	case (oBranchOperation)
+	case (iBranchOperation)
 	//-------------------------------------
 	`JMP:
 	begin

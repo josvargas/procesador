@@ -77,4 +77,29 @@ module ALU_PC # (parameter SIZE=6)
 
 endmodule
 
+//----------------------------------------------------
+
+/*
+Nombre: Sumador para contador de PC
+Proposito: Aumenta en 1 el valor del registro de PC para la nueva instruccion
+Entradas: PC_entrada, almacena el numero actual del contador del programa
+Salidas: PC_salida, almacena el valor del proximo valor del contador del programa
+*/
+
+module branchDir
+(
+		input wire [5:0] iSalto,
+		input wire [9:0] iNewPC,
+		output reg [9:0] oDirNueva
+);
+
+	always @(*)
+	begin
+		if (iSalto[5] == 1)
+			oDirNueva = iNewPC + iSalto[4:0];
+		else
+			oDirNueva = iNewPC - iSalto[4:0];
+	end
+endmodule
+
 
