@@ -2,13 +2,14 @@
 	(
 	 input [2:0] iALUControl,	    
 	 input [7:0] A,B,
+	 input iRegOutputALU,
 	 output wire [7:0] oALUOut,
-	 output wire N,Z,C
+	 output wire N_A,Z_A,C_A,N_B,Z_B,C_B
 	);
 
 	reg [8:0] Out;
 
-	assign oALUOut = Out[7:0];
+	assign oALUOut = (iALUControl!=6)?Out[7:0]:Out[8:1];
 
 	always @(iALUControl,A,B) begin
 		case(iALUControl)
@@ -24,9 +25,12 @@
 	
 	end
 
-	assign Z = (oALUOut==0);
-	assign C = Out[8];
-	assign N = oALUOut[7];
+	assign Z_A = (!iRegOutputALU)?(oALUOut==0):1'b0;
+	assign C_A = (!iRegOutputALU)?((iALUControl!=6)?Out[8]:Out[0]):1'b0;
+	assign N_A = (!iRegOutputALU)?oALUOut[7]:1'b0;
+	assign Z_B = (iRegOutputALU)?(oALUOut==0):1'b0;
+	assign C_B = (iRegOutputALU)?((iALUControl!=6)?Out[8]:Out[0]):1'b0;
+	assign N_B = (iRegOutputALU)?oALUOut[7]:1'b0;
 
 endmodule
 

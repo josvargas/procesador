@@ -22,6 +22,7 @@ Salidas: Contenido de los registros y lineas de control
 	 output reg oSelectMuxRegB,        //Linea que habilita el mux para elegir el Registro B o la informacion adicional en la ALU
 	 output reg oEnableMem,              //Linea que habilita las escrituras en la memoria en 1
 	 output reg oMuxWriteMem,            //Selecciona la entrada del registro (A o B) que va a la entrada de Datos de la memoria RAM 
+         output reg oRegOutputALU,           //Indica el registro en el cual se va a escribir la operacion de la ALU
 	 output reg oSelectInputMemData      //Linea que habilita el mux para elegir la salida de la ALU (0) o la salida de la RAM de//datos (1) para seleccionar la escritura en los registros 
 	);
 
@@ -45,9 +46,10 @@ begin
 		oBranchOperation <= 4'd0;     //Opcion de confirma que la instruccion no es un salto
 		oSelectMuxRegA   <= 1'b0;
 		oSelectMuxRegB   <= 1'b0;
-	    oEnableMem   	 <= 1'b0;
+	    	oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
-	    oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
+	    	oRegOutputALU	 <= 1'b0;
+		oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
 	end
 	//-------------------------------------
 	`LDB:
@@ -62,6 +64,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;
 	        oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
 	end
 	//-------------------------------------
@@ -77,6 +80,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;
 	        oSelectInputMemData <= 1'b0;   
 	end
 	//-------------------------------------
@@ -92,6 +96,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -107,6 +112,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b1;     //Se selecciona la opcion de escritura en la memoria RAM de datos
 		oMuxWriteMem     <= 1'b0;     //Se selecciona el Registro A para escribir en RAM
+	    	oRegOutputALU	 <= 1'b0;
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -122,6 +128,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b1;     //Se selecciona la opcion de escritura en la memoria RAM de datos 
 		oMuxWriteMem     <= 1'b1;     //Se selecciona el Registro B para escribir en RAM
+	    	oRegOutputALU	 <= 1'b0;
 	        oSelectInputMemData <= 1'b1;  
 	end
 	//-------------------------------------
@@ -136,7 +143,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0; //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -152,6 +160,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
 		oMuxWriteMem     <= 1'b0;     
+	    	oRegOutputALU	 <= 1'b1;     //Se elige el registro B como salida en la ALU para definir registros NZC 
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -166,7 +175,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;
 		oSelectMuxRegB   <= 1'b1;     //Se suma la constante en vez del Registro B
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0; //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -181,7 +191,8 @@ begin
 		oSelectMuxRegA   <= 1'b1;    //Se suma la constante en vez del Registro A
 		oSelectMuxRegB   <= 1'b0;     
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;  
+	    	oRegOutputALU	 <= 1'b1;    //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0; //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -197,6 +208,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;     
 	        oEnableMem   	 <= 1'b0;     
 		oMuxWriteMem     <= 1'b0;     
+	    	oRegOutputALU	 <= 1'b0;    //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0; //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -211,7 +223,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;  
 		oSelectMuxRegB   <= 1'b0;     
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b1;    //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0; //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -226,7 +239,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;  
 		oSelectMuxRegB   <= 1'b1;      //Se resta la constante en vez del Registro B
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0; //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -241,7 +255,8 @@ begin
 		oSelectMuxRegA   <= 1'b1;     //Se resta la constante en vez del Registro A  
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b1;     //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -256,7 +271,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;  
 		oSelectMuxRegB   <= 1'b0;     
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;     //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -271,7 +287,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;  
 		oSelectMuxRegB   <= 1'b0;     
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b1;     //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -286,7 +303,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;  
 		oSelectMuxRegB   <= 1'b1;     //Se selecciona la constante en vez del registro B
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;     //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -301,7 +319,8 @@ begin
 		oSelectMuxRegA   <= 1'b1;     //Se selecciona la constante en vez del registro A
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b1;     //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -316,7 +335,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;     
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;     //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -331,7 +351,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;     
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b1;     //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -346,7 +367,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;     
 		oSelectMuxRegB   <= 1'b1;     //Se selecciona la constante en vez del registro B
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;  
+	    	oRegOutputALU	 <= 1'b0;     //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -361,7 +383,8 @@ begin
 		oSelectMuxRegA   <= 1'b1;     //Se selecciona la constante en vez del registro A     
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b1;     //Se elige el registro B como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -376,7 +399,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;  
+	    	oRegOutputALU	 <= 1'b0;     //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -391,7 +415,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;  
+	    	oRegOutputALU	 <= 1'b0;     //Se elige el registro A como salida en la ALU para definir registros NZC
 	        oSelectInputMemData <= 1'b0;  //Se selecciona la opcion de escribir el resultado de la ALU
 	end
 	//-------------------------------------
@@ -406,7 +431,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -421,7 +447,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;  
+	    	oRegOutputALU	 <= 1'b0;   
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -436,7 +463,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -451,7 +479,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -466,22 +495,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
-	        oSelectInputMemData <= 1'b0;  
-	end
-	//-------------------------------------
-	`BACC:
-	begin
-		oEnableA_ID  <= 1'b0;
-		oEnableB_ID  <= 1'b0;
-		oEnableA_WB  <= 1'b0;         
-		oEnableB_WB  <= 1'b0;       
-		oALUControl  <= 3'd7;         
-		oBranchOperation <= 4'd5;      //Se selecciona la opcion de salto C_A=0
-		oSelectMuxRegA   <= 1'b0;          
-		oSelectMuxRegB   <= 1'b0;
-	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;     
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -491,12 +506,13 @@ begin
 		oEnableB_ID  <= 1'b0;
 		oEnableA_WB  <= 1'b0;         
 		oEnableB_WB  <= 1'b0;       
-		oALUControl  <= 3'd7;         
+		oALUControl  <= 3'd6;         
 		oBranchOperation <= 4'd6;      //Se selecciona la opcion de salto N_A = 1
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -511,7 +527,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;     
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -526,7 +543,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -541,7 +559,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -556,7 +575,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -571,7 +591,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -586,7 +607,8 @@ begin
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
 	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
@@ -600,9 +622,10 @@ begin
 		oBranchOperation <= 4'd13;      //Se selecciona la opcion de salto C_A=0
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
-	    oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
-	    oSelectInputMemData <= 1'b0;  
+	    	oEnableMem   	 <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
+	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
 	`NOP:
@@ -615,9 +638,10 @@ begin
 		oBranchOperation <= 4'd0;      
 		oSelectMuxRegA   <= 1'b0;          
 		oSelectMuxRegB   <= 1'b0;
-	    oEnableMem   	 <= 1'b0;     
-		oMuxWriteMem     <= 1'b0;     
-	    oSelectInputMemData <= 1'b0;  
+	   	oEnableMem   	 <= 1'b0;     
+		oMuxWriteMem     <= 1'b0; 
+	    	oRegOutputALU	 <= 1'b0;    
+	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
 	default:
@@ -632,6 +656,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;
 	        oSelectInputMemData <= 1'b0;
 	end	
 	//-------------------------------------	
