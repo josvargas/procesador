@@ -8,21 +8,22 @@ Salidas:
 module procesador # (parameter n=8)
 (
 	input wire Clock, //Entrada que proviene de la señal del reloj
-	
+	input wire Reset,
+	output wire [9:0] wPC_salida
 );
 
 	// Cableado para PC
-	wire [9:0] wPC_entrada, wPC_salida, wPC_suma, wPC_mux, wPC_new, wPC_mux2, wPC_memInstr;
+	wire [9:0] wPC_entrada, /*wPC_salida,*/ wPC_suma, wPC_mux, wPC_new, wPC_mux2, wPC_memInstr;
 	assign wPC_new = wPC_mux[9:0];
 	assign wPC_memInstr = wPC_salida[9:0]; // se asigna a la salida del registro de PC para usarse en memoria de Instrucciones
 
 	// Cableado para decodificador
 	wire [15:0] wInstruccion;
 	wire [9:0] wAditional;
-	wire [2:0] wALUControl;
+	//wire [2:0] wALUControl;
 	wire [3:0] wBranchOperation;
 	wire wEnableA_ID, wEnableB_ID, wEnableA_WB, wEnableB_WB, wSelectMuxRegA, wSelectMuxRegB, wEnableMem,
-	wMuxWriteMem, wMuxWriteMem;
+	wMuxWriteMem; //, wMuxWriteMem;
 	
 	// Cableado para Registro A
 	wire [7:0] wRegistroA_entrada, wRegistroA_salida;
@@ -34,8 +35,8 @@ module procesador # (parameter n=8)
 	wire [5:0] wSalto;
 	
 	//Cableado para muxRegistro A y B
-	wire [7:0] wMuxA_salida, wMuxB_salida, wConstant_aux, wConstant_A, wConstant_B;
-	wire wSelectMuxRegA, wSelectMuxRegB;
+	wire [7:0] wConstant_aux, wConstant_A, wConstant_B;
+	//wire wSelectMuxRegA, wSelectMuxRegB;
 	
 	assign wConstant_aux = wAditional[7:0]; // se asigna para poder usarse para el mux del registro B
 	assign wConstant_A = wAditional[7:0];
@@ -47,7 +48,7 @@ module procesador # (parameter n=8)
 	wire [7:0] wMuxA_salida, wMuxB_salida, wSalida_ALU, wSalida_ALU_aux, wRegistroA_salida_aux, wRegistroB_salida_aux;
 	assign wRegistroA_salida_aux = wRegistroA_salida[7:0];
 	assign wRegistroB_salida_aux = wRegistroB_salida[7:0];
-	wire wSalida_ALU_aux = wSalida_ALU[7:0];
+	//wire wSalida_ALU_aux = wSalida_ALU[7:0];
 	wire wN_A, wZ_A, wC_A,wN_B, wZ_B, wC_B,wRegOutputALU;
 
 	wire [7:0] wSelectorRegistros;
@@ -98,7 +99,7 @@ module procesador # (parameter n=8)
 	
 	memory mem_instrucciones
 	(
-		.iAddressPC(wPC_memInstr);
+		.iAddressPC(wPC_memInstr),
 		.oInstruction(wInstruccion)
 	);
 	
@@ -218,7 +219,7 @@ module procesador # (parameter n=8)
 		.iALUControl(wALUControl),
 		.A(wMuxA_salida),
 		.B(wMuxB_salida),
-		.iRegOutputALU(wRegOutputALU)
+		.iRegOutputALU(wRegOutputALU),
 		.oALUOut(wSalida_ALU),
 		.N_A(wN_A),
 		.Z_A(wZ_A),
@@ -260,9 +261,9 @@ module procesador # (parameter n=8)
 	
 	// Alambrado de mux con salida de ALU y RAM
 	
-	MUX #(8) mux_ALU_RAM
+	MUX #(2) mux_ALU_RAM
 	(
-		.A(wSalida_ALU_aux),
+		.A(wSalida_ALU), //borre _aux ?¡?¡?¡???¡?
 		.B(wSalida_RAM),
 		.Sel(wSelectInputMemData),
 		.Result(wMuxAB_A)
