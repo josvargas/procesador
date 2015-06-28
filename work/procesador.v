@@ -70,14 +70,41 @@ module procesador # (parameter n=8)
 	//////////////////////////////////////////////////////////
 	// Alambrado de IF (Fetch)
 	//////////////////////////////////////////////////////////
-	
+
 	// Alambrado de PC (Branches)
+
+	wire [9:0] wInputBranchPC, wPC_new_save;
+	wire wflush;
+
+	Branch_Counter bcounter(
+		.Reset(Reset),
+		.wBranchTaken(wBranchTaken),
+		.wPC_salida(wPC_salida),
+		.oflush(wflush)
+	);
+
+	FFD #(10) reg_PC_new_save  
+	(
+		.Clock(Clock),
+		.Reset(Reset),
+		.Enable(!wHazardClear),
+		.D(wPC_new_ID),  
+		.Q(wPC_new_save) 
+	);
+
+	MUX #(10) mux_PC_MUX_IF1
+	(
+		.A(wInputBranchPC),
+		.B(wPC_new_save),
+		.Sel((!wBranchTaken)&&(wEnableBranch)),
+		.Result(wPC_entrada)
+	);
 
 	FFD #(10) PC  // Se conecta lo respectivo al registro del contador de PC
 	(
 		.Clock(Clock),
 		.Reset(Reset),
-		.Enable(1),
+		.Enable(!wHazardClear),
 		.D(wPC_entrada),
 		.Q(wPC_salida)
 	);
@@ -87,10 +114,20 @@ module procesador # (parameter n=8)
 		.Clock(Clock),
 		.PC_entrada(wPC_salida),
 		.Enable(1), // cambiar, poner una señal
-		.PC_salida(wPC_suma)
+		.PC_salida(wPC_new)
 	);
 	
-	FFD #(10) PC_nuevo  // Se conecta lo respectivo al registro del contador de PC
+/*	wire [9:0] wPC_new_IF2_mux;
+
+	MUX #(10) mux_PC_MUX_IF2
+	(
+		.A(wPC_suma),
+		.B(wPC_entrada+10'd3),
+		.Sel(wBranchTaken),
+		.Result(wPC_new_IF2_mux)
+	);*/
+
+	/*FFD #(10) PC_nuevo  // Se conecta lo respectivo al registro del contador de PC
 	(
 		.Clock(Clock),
 		.Reset(Reset),
@@ -98,7 +135,7 @@ module procesador # (parameter n=8)
 		.D(wPC_suma),  
 		.Q(wPC_new) //se dirige al mux de toma o no el branch
 	);
-	
+	*/
 	// Alambrado a la Memoria de Instrucciones
 	
 	memory mem_instrucciones
@@ -114,11 +151,21 @@ module procesador # (parameter n=8)
 	wire [9:0] wPC_new_ID, wPC_salida_ID;
 	wire [15:0] wInstruccion_ID;
 
+	/*wire [9:0] wPC_new_ID_mux;
+
+	MUX #(10) mux_PC_MUX_ID
+	(
+		.A(wPC_new),
+		.B(wPC_entrada+10'd2),
+		.Sel(wBranchTaken),
+		.Result(wPC_new_ID_mux)
+	);*/
+
 	FFD #(10) reg_PC_new_IF  
 	(
 		.Clock(Clock),
 		.Reset(Reset),
-		.Enable(1),
+		.Enable(!wHazardClear),
 		.D(wPC_new),  
 		.Q(wPC_new_ID) 
 	);
@@ -127,7 +174,7 @@ module procesador # (parameter n=8)
 	(
 		.Clock(Clock),
 		.Reset(Reset),
-		.Enable(1),
+		.Enable(!wHazardClear),
 		.D(wPC_salida),  
 		.Q(wPC_salida_ID) 
 	);
@@ -135,7 +182,7 @@ module procesador # (parameter n=8)
 	FFD #(16) reg_Instruccion_IF  
 	(
 		.Clock(Clock),
-		.Reset(Reset),
+		.Reset(Reset|wflush|wHazardClear),
 		.Enable(1),
 		.D(wInstruccion),  
 		.Q(wInstruccion_ID) 
@@ -164,6 +211,16 @@ module procesador # (parameter n=8)
 		.oRegOutputALU(wRegOutputALU),
 		.oSelectInputMemData(wSelectInputMemData)  
 	);
+
+	wire wHazardClear;
+
+	hazardDetection hazardUnit
+	(
+		.Clock(Clock),
+		.Reset(Reset),
+		.wSelectInputMemData_ALU(wSelectInputMemData),
+		.rHazardClear(wHazardClear)
+	);
 	
 	//Alambrado de Muxes para habilitar escritura de ID
 	MUX #(8) mux_escritura_A_ID
@@ -173,6 +230,8 @@ module procesador # (parameter n=8)
 		.Sel(wEnableA_ID),
 		.Result(wRegistroA_entrada)
 	);
+
+	wire [7:0] wRegistroB_forward;
 	
 	MUX #(8) mux_escritura_B_ID
 	(
@@ -182,7 +241,6 @@ module procesador # (parameter n=8)
 		.Result(wRegistroB_entrada)
 	);
 
-	
 	// Alambrado para registro A
 	
 	FFD #(8) registroA
@@ -212,6 +270,23 @@ module procesador # (parameter n=8)
 		.iSalto(wAditional[5:0]),
 		.iPC(wPC_salida_ID),
 		.oDirNueva(wPC_Branch)
+	); 
+
+	wire wEnableBranch;
+
+	branchEnabler myCPUbranchEnabler 
+	(
+		.Reset(Reset),
+		.wInstruction(wInstruccion_ID[15:10]),
+		.rEnableBranch(wEnableBranch)
+	);
+
+	MUX #(10) mux_PC_ID
+	(
+		.A(wPC_new_ID),
+		.B(wPC_Branch),
+		.Sel(wEnableBranch),
+		.Result(wInputBranchPC)
 	);
 
 	//***************************************************************************************************
@@ -239,7 +314,7 @@ module procesador # (parameter n=8)
 		.Clock(Clock),
 		.Reset(Reset),
 		.Enable(1),
-		.D(wRegistroB_salida_ALU),  
+		.D(wRegistroB_salida),  
 		.Q(wRegistroB_salida_ALU) 
 	);
 
@@ -342,7 +417,17 @@ module procesador # (parameter n=8)
 		.Q(wSelectInputMemData_ALU) 
 	); 
 
-	FFD #(10) reg_PC_new_ID
+	/*wire [9:0] wPC_new_ALU_mux;
+
+	MUX #(10) mux_PC_MUX
+	(
+		.A(wPC_new_ID),
+		.B(wPC_entrada+1'b1),
+		.Sel(wBranchTaken),
+		.Result(wPC_new_ALU_mux)
+	);*/
+
+	/*FFD #(10) reg_PC_new_ID
 	(
 		.Clock(Clock),
 		.Reset(Reset),
@@ -358,12 +443,25 @@ module procesador # (parameter n=8)
 		.Enable(1),
 		.D(wPC_Branch),  
 		.Q(wPC_Branch_ALU) 
-	);
+	);*/
 
 	//////////////////////////////////////////////////////////////
 	// Alambrado ALU
 	//////////////////////////////////////////////////////////////
-	
+
+	//Hazard unit detection 
+
+	/*wire wHazardClear;
+
+	hazardDetection hazardous
+	(
+		.Reset(Reset),
+		.wSelectInputMemData_ALU(wSelectInputMemData_ALU),
+		.wEnableB_WB_MEM(wEnableB_WB_MEM),
+		.wEnableB_WB(wEnableB_WB),
+		.rHazardClear(wHazardClear)
+	);
+	*/
 	// Alambrado para registro de branchTaken
 	
 	branchTaken branchTaken1
@@ -378,19 +476,29 @@ module procesador # (parameter n=8)
 		.oBranchTaken(wBranchTaken)
 	);
 
-	MUX #(10) mux_PC_ID
+	wire [7:0] wRegistroB_salida_forward, wRegistroA_salida_forward;
+
+	MUX #(8) mux_Forward_B
 	(
-		.A(wPC_new_ALU),
-		.B(wPC_Branch_ALU),
-		.Sel(wBranchTaken),
-		.Result(wPC_entrada)
+		.A(wRegistroB_salida_ALU),
+		.B(wSalida_ALU_WB),
+		.Sel((wEnableB_WB_WB)&&(!wSelectInputMemData_WB)),
+		.Result(wRegistroB_salida_forward)
+	);
+
+	MUX #(8) mux_Forward_A
+	(
+		.A(wRegistroA_salida_ALU),
+		.B(wSalida_ALU_WB),
+		.Sel((wEnableA_WB_WB)&&(!wSelectInputMemData_WB)),
+		.Result(wRegistroA_salida_forward)
 	);
 
 	// Alambrado de mux para registro A
 	MUX #(8) muxRegistroA
 	(
-		.A(wAditional_ALU[7:0]),
-		.B(wRegistroA_salida_ALU),
+		.A(wRegistroA_salida_forward),
+		.B(wAditional_ALU[7:0]),
 		.Sel(wSelectMuxRegA_ALU),
 		.Result(wMuxA_salida)
 	);
@@ -399,8 +507,8 @@ module procesador # (parameter n=8)
 	
 	MUX #(8) muxRegistroB
 	(
-		.A(wAditional_ALU[7:0]),
-		.B(wRegistroB_salida_ALU),
+		.A(wRegistroB_salida_forward),
+		.B(wAditional_ALU[7:0]),
 		.Sel(wSelectMuxRegB_ALU),
 		.Result(wMuxB_salida)
 	);
@@ -409,6 +517,8 @@ module procesador # (parameter n=8)
 	
 	ALU aluu
 	(
+		.Clock(Clock),
+		.Reset(Reset),
 		.iALUControl(wALUControl_ALU),
 		.A(wMuxA_salida),
 		.B(wMuxB_salida),
@@ -424,8 +534,8 @@ module procesador # (parameter n=8)
 	
 	MUX #(8) mux_AccesoRAM_sinALU
 	(
-		.A(wRegistroA_salida_ALU),
-		.B(wRegistroB_salida_ALU),
+		.A(wRegistroA_salida_forward),
+		.B(wRegistroB_salida_forward),
 		.Sel(wMuxWriteMem_ALU),
 		.Result(wDatos_Registros)	
 	);
