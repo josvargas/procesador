@@ -46,9 +46,9 @@ begin
 		oBranchOperation <= 4'd0;     //Opcion de confirma que la instruccion no es un salto
 		oSelectMuxRegA   <= 1'b0;
 		oSelectMuxRegB   <= 1'b0;
-	    oEnableMem   	 <= 1'b0;
+	    	oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
-	    oRegOutputALU	 <= 1'b0;
+	    	oRegOutputALU	 <= 1'b0;
 		oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
 	end
 	//-------------------------------------
@@ -64,7 +64,7 @@ begin
 		oSelectMuxRegB   <= 1'b0;
 	        oEnableMem   	 <= 1'b0;
 		oMuxWriteMem     <= 1'b0;
-	    	oRegOutputALU	 <= 1'b0;
+	    	oRegOutputALU	 <= 1'b1;
 	        oSelectInputMemData <= 1'b1;  // con 1 se selecciona la salida de la memoria para escribir en el registro
 	end
 	//-------------------------------------
@@ -129,7 +129,7 @@ begin
 	        oEnableMem   	 <= 1'b1;     //Se selecciona la opcion de escritura en la memoria RAM de datos 
 		oMuxWriteMem     <= 1'b1;     //Se selecciona el Registro B para escribir en RAM
 	    	oRegOutputALU	 <= 1'b0;
-	        oSelectInputMemData <= 1'b1;  
+	        oSelectInputMemData <= 1'b0;  
 	end
 	//-------------------------------------
 	`ADDA:
