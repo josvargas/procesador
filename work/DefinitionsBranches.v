@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
-`ifndef DEFINTIONS_V
-`define DEFINTIONS_V
+`ifndef DEFINTIONSBRANCHES_V
+`define DEFINTIONSBRANCHES_V
 	
 `default_nettype none	
 `define JMP   6'h01
