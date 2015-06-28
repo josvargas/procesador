@@ -11,7 +11,7 @@ Salidas: el bit de branch taken
 	(
 	 input wire [3:0] iBranchOperation,  
 	 input wire N_A,Z_A,C_A,N_B,Z_B,C_B, 
-	 output reg oBranchTaken,             
+	 output reg oBranchTaken            
 	);
 
 
