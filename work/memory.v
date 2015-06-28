@@ -29,7 +29,7 @@ module  memory(
 
 
 	initial begin
-		$readmemb("intru_rom", my_memory); //Carga la memoria con los datos de memory
+		$readmemb("instru_rom", my_memory); //Carga la memoria con los datos de memory
 	end
 
 	always @ ( iAddressPC )
